@@ -105,3 +105,5 @@ Docker or access to the real local roots.
 
 Keep `.env`, OAuth secrets, and source-root contents out of commits. Review
 access exclusions before exposing the proxy beyond the local machine.
+
+This project is licensed under the [MIT License](LICENSE).
