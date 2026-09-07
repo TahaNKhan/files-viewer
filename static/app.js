@@ -20,7 +20,7 @@
     const r = await api('/api/file/' + encodedPath(path)); if (id !== state.request) return; if (!r.ok) { message('File could not be loaded.', true); return; }
     const kind = r.headers.get('content-type') || '', viewerKind = r.headers.get('x-viewer-kind') || '', fragment = document.createDocumentFragment(), box = $('#viewer');
     const title = document.createElement('h1'); title.className = 'file-title'; title.textContent = partsFor(path).pop(); if (!state.direct) fragment.append(title);
-    if (viewerKind === 'markdown') { const md = document.createElement('div'); md.className = 'markdown'; md.innerHTML = await r.text(); if (id !== state.request) return; fragment.append(md); }
+    if (viewerKind === 'markdown') { const md = document.createElement('div'); md.className = 'markdown markdown-body'; md.innerHTML = await r.text(); if (id !== state.request) return; fragment.append(md); }
     else if (kind.includes('text/html')) { const frame = document.createElement('iframe'); frame.sandbox = ''; frame.referrerPolicy = 'no-referrer'; frame.src = '/api/file/' + encodedPath(path); fragment.append(frame); }
     else if (kind.startsWith('image/')) { const img = document.createElement('img'); img.src = '/api/file/' + encodedPath(path); img.alt = title.textContent; fragment.append(img); }
     else if (kind === 'application/pdf') { const frame = document.createElement('iframe'); frame.src = '/api/file/' + encodedPath(path); frame.title = title.textContent; fragment.append(frame); }

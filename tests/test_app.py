@@ -3,7 +3,7 @@ from pathlib import Path
 
 import httpx
 
-from app.main import Settings, Root, _open_path, create_app
+from app.main import Settings, Root, _markdown, _open_path, create_app
 
 
 def make_app(tmp_path):
@@ -43,3 +43,12 @@ def test_paths_and_content(tmp_path):
         assert getattr(exc, "status", None) == 403
     else:
         raise AssertionError("traversal was accepted")
+
+
+def test_github_flavored_markdown_is_sanitized():
+    root = Root("projects", Path("/tmp"), "Projects", -1)
+    rendered = _markdown("~~old~~\n\n- [x] done\n\n| A | B |\n| - | - |\n| 1 | 2 |\n\n<script>x</script>", root, ["readme.md"])
+    assert "<s>old</s>" in rendered
+    assert 'class="task-list-item"' in rendered
+    assert "<table>" in rendered
+    assert "<script" not in rendered

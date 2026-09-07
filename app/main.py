@@ -141,11 +141,11 @@ def _raw_response(settings, virtual_path, request):
         os.close(fd)
 
 def _markdown(text, root, parts):
-    md = MarkdownIt("commonmark", {"html": False, "linkify": True}).enable("table").use(tasklists_plugin)
+    md = MarkdownIt("gfm-like", {"html": False}).use(tasklists_plugin)
     rendered = md.render(text)
     try:
         import bleach
-        rendered = bleach.clean(rendered, tags={"p","br","hr","h1","h2","h3","h4","h5","h6","strong","em","del","blockquote","pre","code","ol","ul","li","table","thead","tbody","tr","th","td","a","input"}, attributes={"a":["href","title","rel"], "code":["class"], "input":["type","disabled","checked"]}, protocols={"http","https","mailto"}, strip=True)
+        rendered = bleach.clean(rendered, tags={"p","br","hr","h1","h2","h3","h4","h5","h6","strong","em","s","del","blockquote","pre","code","ol","ul","li","table","thead","tbody","tr","th","td","a","input"}, attributes={"a":["href","title","rel"], "code":["class"], "ul":["class"], "li":["class"], "input":["class","type","disabled","checked"]}, protocols={"http","https","mailto"}, strip=True)
     except ImportError: rendered = html.escape(rendered)
     try:
         from bs4 import BeautifulSoup

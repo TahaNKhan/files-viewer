@@ -49,8 +49,9 @@ as `text/plain`; binary files remain downloads. Mode flags require a file, and
 invalid or duplicate values return `400`. See [`skill/SKILL.md`](skill/SKILL.md)
 for Hermes link construction.
 
-Supported previews include sanitized Markdown, sandboxed HTML, plain text/code,
-images, and PDFs. Unsupported binaries use the download endpoint.
+Supported previews include sanitized GitHub-flavored Markdown styled with the
+vendored `github-markdown-css` library, sandboxed HTML, plain text/code, images,
+and PDFs. Unsupported binaries use the download endpoint.
 
 ## Security model
 
