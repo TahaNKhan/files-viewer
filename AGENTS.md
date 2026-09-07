@@ -14,8 +14,8 @@ write, delete, upload, shell-execution, or arbitrary proxy capabilities.
   request must replace previous viewer content and must not allow an older
   asynchronous response to commit after a newer request.
 - `static/index.html` and `static/styles.css` define the shell and direct mode.
-- Compose mounts `/home/taha/projects` as `projects` and `/home/taha/.hermes` as
-  `hermes`, both read-only.
+- Compose mounts the host directories configured by `PROJECTS_HOST_DIR` and
+  `HERMES_HOST_DIR` as the read-only `projects` and `hermes` roots.
 
 ## Safety invariants
 

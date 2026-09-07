@@ -172,6 +172,9 @@ def create_app(settings: Settings | None = None):
     async def healthz(): return {"status":"ok", "roots": sorted(settings.roots)}
     @app.get("/api/whoami")
     async def whoami(request: Request): return {"email":request.headers.get("x-forwarded-email"), "user":request.headers.get("x-forwarded-user"), "roots":[{"name":r.name,"label":r.label} for r in settings.roots.values()]}
+    @app.get("/api/roots")
+    async def roots():
+        return {"roots":[{"name":r.name,"label":r.label,"route":_safe_url(r, []),"path":str(r.path)} for r in settings.roots.values()]}
     @app.get("/api/list/{virtual_path:path}")
     async def list_dir(virtual_path: str):
         root, parts, fd = _open_path(settings, virtual_path, directory=True)

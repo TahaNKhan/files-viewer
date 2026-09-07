@@ -18,12 +18,12 @@ services:
       SERVE_HTML: "1"
     volumes:
       - type: bind
-        source: /home/taha/projects
+        source: ${PROJECTS_HOST_DIR:?set PROJECTS_HOST_DIR}
         target: /srv/projects
         read_only: true
         bind: {create_host_path: false}
       - type: bind
-        source: /home/taha/.hermes
+        source: ${HERMES_HOST_DIR:?set HERMES_HOST_DIR}
         target: /srv/hermes
         read_only: true
         bind: {create_host_path: false}

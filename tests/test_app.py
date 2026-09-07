@@ -23,6 +23,8 @@ def test_paths_and_content(tmp_path):
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
             assert (await client.get("/healthz")).status_code == 200
+            roots = await client.get("/api/roots")
+            assert roots.status_code == 200 and roots.json()["roots"][0]["route"] == "/projects"
             assert (await client.get("/api/list/projects")).json()["entries"][0]["name"] == "note.txt"
             md = await client.get("/api/file/projects/readme.md")
             assert md.status_code == 200 and "<script" not in md.text

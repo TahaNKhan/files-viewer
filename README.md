@@ -11,7 +11,8 @@ The production-shaped local stack is Docker Compose:
 
 - `files-viewer` runs FastAPI/Uvicorn on internal port `3030`.
 - `oauth2-proxy` exposes `127.0.0.1:4181` and forwards authenticated requests.
-- `projects` maps to `/home/taha/projects`; `hermes` maps to `/home/taha/.hermes`.
+- `projects` and `hermes` are read-only virtual roots whose host directories
+  are configured by `PROJECTS_HOST_DIR` and `HERMES_HOST_DIR` in `.env`.
 - Source mounts are read-only. The viewer drops capabilities and uses a
   read-only filesystem with a temporary `/tmp`.
 
@@ -48,6 +49,10 @@ Raw mode is also available on `/api/file/...` URLs. Text-like files are returned
 as `text/plain`; binary files remain downloads. Mode flags require a file, and
 invalid or duplicate values return `400`. See [`skill/SKILL.md`](skill/SKILL.md)
 for Hermes link construction.
+
+Authenticated clients can call `/api/roots` to discover the configured virtual
+root names, route prefixes, labels, and container-side source paths. Host bind
+directories remain deployment configuration in `.env` and are not returned.
 
 Supported previews include sanitized GitHub-flavored Markdown styled with the
 vendored `github-markdown-css` library, sandboxed HTML, plain text/code, images,
@@ -98,6 +103,8 @@ Docker or access to the real local roots.
 | Variable | Default | Meaning |
 | --- | --- | --- |
 | `SERVE_ROOTS` | `projects:/srv/projects,hermes:/srv/hermes` | Virtual root mappings |
+| `PROJECTS_HOST_DIR` | — | Host directory mounted as `/srv/projects` |
+| `HERMES_HOST_DIR` | — | Host directory mounted as `/srv/hermes` |
 | `STATIC_DIR` | `static` | Frontend asset directory |
 | `ACCESS_CONFIG` | `config/access.json` | Exclusion configuration |
 | `MAX_FILE_BYTES` | `5242880` | Maximum file read size |
