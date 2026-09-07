@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+markdown-it-py
+mdit-py-plugins
+bleach
+linkify-it-py
+beautifulsoup4

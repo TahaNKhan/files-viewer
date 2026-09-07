@@ -1,0 +1,81 @@
+name: files-viewer
+services:
+  files-viewer:
+    build: .
+    image: files-viewer:local
+    restart: unless-stopped
+    user: "${FILE_UID:?set FILE_UID}:${FILE_GID:?set FILE_GID}"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp]
+    environment:
+      SERVE_ROOTS: "projects:/srv/projects,hermes:/srv/hermes"
+      STATIC_DIR: /app/static
+      ACCESS_CONFIG: /app/config/access.json
+      MAX_FILE_BYTES: "5242880"
+      MAX_LIST_ENTRIES: "2000"
+      SERVE_HTML: "1"
+    volumes:
+      - type: bind
+        source: /home/taha/projects
+        target: /srv/projects
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: /home/taha/.hermes
+        target: /srv/hermes
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ./config/access.json
+        target: /app/config/access.json
+        read_only: true
+        bind: {create_host_path: false}
+    networks: [files-net]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:3030/healthz', timeout=3).read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.10.0
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp]
+    environment:
+      OAUTH2_PROXY_CLIENT_ID: "${OIDC_CLIENT_ID:?set OIDC_CLIENT_ID}"
+      OAUTH2_PROXY_CLIENT_SECRET: "${OIDC_CLIENT_SECRET:?set OIDC_CLIENT_SECRET}"
+      OAUTH2_PROXY_COOKIE_SECRET: "${COOKIE_SECRET:?set COOKIE_SECRET}"
+    command:
+      - --provider=oidc
+      - --oidc-issuer-url=https://auth.khome.dev/application/o/files-viewer/
+      - --redirect-url=https://files.mm.khome.dev/oauth2/callback
+      - --reverse-proxy=true
+      - --scope=openid profile email
+      - --email-domain=*
+      - --insecure-oidc-allow-unverified-email=true
+      - --insecure-oidc-skip-nonce=false
+      - --code-challenge-method=S256
+      - --cookie-name=__Host-files_viewer_oauth
+      - --cookie-path=/
+      - --cookie-secure=true
+      - --cookie-httponly=true
+      - --cookie-samesite=lax
+      - --cookie-expire=1h
+      - --upstream=http://files-viewer:3030/
+      - --http-address=0.0.0.0:4181
+      - --pass-user-headers=true
+      - --pass-basic-auth=false
+      - --pass-access-token=false
+      - --pass-authorization-header=false
+      - --skip-provider-button=true
+    ports: ["127.0.0.1:4181:4181"]
+    networks: [files-net]
+    depends_on:
+      files-viewer: {condition: service_healthy}
+networks:
+  files-net: {driver: bridge}

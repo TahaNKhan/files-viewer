@@ -1,0 +1,6 @@
+{
+  "excluded_subtrees": {
+    "projects": ["file-server/.git", "file-server/.env", "files-viewer/config"],
+    "hermes": []
+  }
+}
